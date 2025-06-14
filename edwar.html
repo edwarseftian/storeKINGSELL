@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Toko Jual Beli Akun</title>
+<style>
+  /* Reset and base */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #f5f7fa;
+    color: #1e293b;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  button {
+    font-family: inherit;
+  }
+
+  /* Splash screen styles */
+  #splash {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 9999;
+    transition: opacity 0.6s ease, visibility 0.6s;
+  }
+  #splash.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+  #splash h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    font-weight: 900;
+    text-align: center;
+    max-width: 320px;
+  }
+  #splash p {
+    font-size: 1.25rem;
+    max-width: 320px;
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  #playButton {
+    background: white;
+    color: #6d28d9;
+    font-weight: 700;
+    font-size: 1.2rem;
+    padding: 1rem 3rem;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(107,33,168,0.4);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  #playButton:hover,
+  #playButton:focus {
+    background-color: #6d28d9;
+    color: white;
+    outline: none;
+  }
+
+  /* Container */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+  }
+
+  /* Header */
+  header {
+    background: #0f172a;
+    color: white;
+    padding: 16px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+  .header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo {
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+    background: linear-gradient(45deg, #06b6d4, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    cursor: pointer;
+  }
+  nav.desktop-nav {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  nav.desktop-nav button {
+    background: none;
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  nav.desktop-nav button:hover,
+  nav.desktop-nav button:focus {
+    background-color: #1e40af;
+    outline: none;
+  }
+  nav.desktop-nav button.active {
+    background-color: #8b5cf6;
+    font-weight: 700;
+  }
+
+  /* Mobile menu button hidden (no mobile menu for now) */
+  .mobile-menu-button {
+    display: none;
+  }
+
+  /* Section headings */
+  section.account-section, section#payment-section {
+    margin-top: 48px;
+  }
+  section.account-section h2, section#payment-section h2 {
+    font-size: 2rem;
+    margin-bottom: 24px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Account grid */
+  .account-grid {
+    display: grid;
+    gap: 32px;
+    grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+  }
+
+  /* Account card */
+  article.account-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  article.account-card:hover,
+  article.account-card:focus-within {
+    box-shadow: 0 20px 40px rgba(6, 182, 212, 0.25);
+    transform: translateY(-6px);
+  }
+  .account-image {
+    width: 100%;
+    height: 160px;
+    border-radius: 12px;
+    background-color: #e0e7ff;
+    margin-bottom: 16px;
+    overflow: hidden;
+    position: relative;
+  }
+  .account-image img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .account-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1e293b;
+  }
+  .account-details {
+    font-size: 0.9rem;
+    color: #475569;
+    margin-bottom: 12px;
+  }
+  .account-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #06b6d4;
+    margin-top: auto;
+  }
+
+  /* Buy button */
+  .btn-buy {
+    margin-top: 12px;
+    background: #8b5cf6;
+    border: none;
+    width: 100%;
+    padding: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .btn-buy:hover,
+  .btn-buy:focus {
+    background-color: #6d28d9;
+    outline: none;
+  }
+
+  /* Payment section content */
+  #payment-section p {
+    font-size: 1rem;
+    max-width: 600px;
+    line-height: 1.6;
+    color: #334155;
+  }
+
+  /* Footer */
+  footer {
+    background: #0f172a;
+    color: #94a3b8;
+    padding: 32px 24px;
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 64px;
+  }
+
+  /* Responsive */
+  @media(max-width:767px) {
+    nav.desktop-nav {
+      gap: 12px;
+    }
+    section.account-section h2,
+    section#payment-section h2 {
+      font-size: 1.6rem;
+    }
+  }
+</style>
+</head>
+<body>
+  <!-- Splash screen -->
+  <div id="splash" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="welcomeDesc">
+    <h1 id="welcomeTitle">Selamat Datang di AkunStore</h1>
+    <p id="welcomeDesc">Tempat terbaik untuk jual beli akun game dengan aman dan terpercaya.</p>
+    <button id="playButton" aria-label="Mulai dan masuk ke beranda">Tekan Play</button>
+  </div>
+
+  <!-- Main content -->
+  <header>
+    <div class="container header-inner" role="banner">
+      <div class="logo" tabindex="0">AkunStore</div>
+      <nav class="desktop-nav" role="navigation" aria-label="Filter kategori akun dan menu lainnya">
+        <button class="filter-button active" data-filter="all" aria-pressed="true">Semua</button>
+        <button class="filter-button" data-filter="ml" aria-pressed="false">Mobile Legends</button>
+        <button class="filter-button" data-filter="pubg" aria-pressed="false">PUBG Mobile</button>
+        <button class="filter-button" data-filter="ff" aria-pressed="false">Free Fire</button>
+        <button class="filter-button" data-filter="payment" aria-pressed="false">Payment</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" tabindex="-1">
+    <section id="ml-section" class="account-section" aria-label="Akun Mobile Legends">
+      <h2>Mobile Legends</h2>
+      <div class="account-grid">
+        <article class="account-card" data-category="ml" tabindex="0">
+          <div class="account-image" aria-label="Gambar akun Mobile Legends level Mythic dengan skin hero terkenal">
+            <img src="https://placehold.co/400x160?text=ML+Mythic" alt="Akun Mobile Legends level Mythic dengan skin Marshall dan Valir" />
+          </div>
+          <h3 class="account-title">Akun Mobile Legends - Tier Mythic</h3>
+          <p class="account-details">Level: 65 | Skin: Marshall & Valir | RP: 200+</p>
+          <p class="account-price">Rp 350.000</p>
+          <button class="btn-buy" aria-label="Beli Akun Mobile Legends Mythic">Beli Sekarang</button>
+        </article>
+        <article class="account-card" data-category="ml" tabindex="0">
+          <div class="account-image" aria-label="Gambar akun Mobile Legends rank Epic">
+            <img src="https://placehold.co/400x160?text=ML+Epic" alt="Akun Mobile Legends rank Epic dengan berbagai skin langka" />
+          </div>
+          <h3 class="account-title">Akun Mobile Legends - Rank Epic</h3>
+          <p class="account-details">Level: 50 | Skin: Collector's Edition</p>
+          <p class="account-price">Rp 200.000</p>
+          <button class="btn-buy" aria-label="Beli Akun Mobile Legends Epic">Beli Sekarang</button>
+        </article>
+      </div>
+    </section>
+
+    <section id="pubg-section" class="account-section" aria-label="Akun PUBG Mobile" hidden>
+      <h2>PUBG Mobile</h2>
+      <div class="account-grid">
+        <article class="account-card" data-category="pubg" tabindex="0">
+          <div class="account-image" aria-label="Gambar akun PUBG Mobile rank Ace dengan skin langka">
+            <img src="https://placehold.co/400x160?text=PUBG+Ace" alt="Akun PUBG Mobile rank Ace dengan banyak skin langka dan emot premium" />
+          </div>
+          <h3 class="account-title">Akun PUBG Mobile - Rank Ace</h3>
+          <p class="account-details">Level: 80 | Skin langka | Emot premium</p>
+          <p class="account-price">Rp 400.000</p>
+          <button class="btn-buy" aria-label="Beli Akun PUBG Mobile Rank Ace">Beli Sekarang</button>
+        </article>
+        <article class="account-card" data-category="pubg" tabindex="0">
+          <div class="account-image" aria-label="Gambar akun PUBG Mobile level Diamond">
+            <img src="https://placehold.co/400x160?text=PUBG+Diamond" alt="Akun PUBG Mobile level Diamond dengan item spesial" />
+          </div>
+          <h3 class="account-title">Akun PUBG Mobile - Level Diamond</h3>
+          <p class="account-details">Level: 60 | Item terbatas | Rank Diamond</p>
+          <p class="account-price">Rp 280.000</p>
+          <button class="btn-buy" aria-label="Beli Akun PUBG Mobile Level Diamond">Beli Sekarang</button>
+        </article>
+      </div>
+    </section>
+
+    <section id="ff-section" class="account-section" aria-label="Akun Free Fire" hidden>
+      <h2>Free Fire</h2>
+      <div class="account-grid">
+        <article class="account-card" data-category="ff" tabindex="0">
+          <div class="account-image" aria-label="Gambar akun Free Fire rank Platinum dengan outfit spesial">
+            <img src="https://placehold.co/400x160?text=FF+Platinum" alt="Akun Free Fire rank Platinum dengan outfit spesial dan diamond royale" />
+          </div>
+          <h3 class="account-title">Akun Free Fire - Diamond Royale</h3>
+          <p class="account-details">Level: 70 | Rank: Platinum | Outfit spesial</p>
+          <p class="account-price">Rp 275.000</p>
+          <button class="btn-buy" aria-label="Beli Akun Free Fire Diamond Royale">Beli Sekarang</button>
+        </article>
+        <article class="account-card" data-category="ff" tabindex="0">
+          <div class="account-image" aria-label="Gambar akun Free Fire level Gold">
+            <img src="https://placehold.co/400x160?text=FF+Gold" alt="Akun Free Fire level Gold dengan skin unik" />
+          </div>
+          <h3 class="account-title">Akun Free Fire - Level Gold</h3>
+          <p class="account-details">Level: 45 | Skin unik | Rank Gold</p>
+          <p class="account-price">Rp 150.000</p>
+          <button class="btn-buy" aria-label="Beli Akun Free Fire Level Gold">Beli Sekarang</button>
+        </article>
+      </div>
+    </section>
+
+    <section id="payment-section" aria-label="Informasi Pembayaran" hidden>
+      <h2>Payment</h2>
+      <p>Terima kasih telah memilih AkunStore! Berikut informasi pembayaran yang tersedia untuk transaksi akun:</p>
+      <ul>
+        <li><strong>Bank Transfer:</strong> Transfer ke BCA 123-456-789 a.n. AkunStore</li>
+        <li><strong>Gopay/OVO/Dana:</strong> Kirim ke nomor 0812-3456-7890 dengan nama AkunStore</li>
+        <li><strong>Paypal:</strong> payments@akunstore.com</li>
+      </ul>
+      <p>Setelah melakukan pembayaran, silakan hubungi customer service kami untuk konfirmasi pembayaran dan proses pengiriman akun.</p>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2024 AkunStore. Semua hak cipta dilindungi.
+  </footer>
+
+<script>
+  // Splash screen play button
+  const splash = document.getElementById('splash');
+  const playButton = document.getElementById('playButton');
+  const container = document.querySelector('.container');
+
+  playButton.addEventListener('click', () => {
+    // Fade out splash
+    splash.classList.add('hidden');
+
+    // Remove from accessibility flow after fade out
+    setTimeout(() => {
+      splash.setAttribute('aria-hidden', 'true');
+      container.focus(); // set focus to main container for accessibility
+    }, 600);
+  });
+
+  // Category filtering buttons including payment
+  const filterButtons = document.querySelectorAll('nav.desktop-nav button.filter-button');
+  const sections = {
+    all: ['ml-section', 'pubg-section', 'ff-section', 'payment-section'],
+    ml: ['ml-section'],
+    pubg: ['pubg-section'],
+    ff: ['ff-section'],
+    payment: ['payment-section']
+  };
+
+  filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      // Update active button and aria-pressed attributes
+      filterButtons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      button.classList.add('active');
+      button.setAttribute('aria-pressed', 'true');
+
+      const filter = button.getAttribute('data-filter');
+
+      // Show/Hide sections based on filter
+      Object.entries(sections).forEach(([key, ids]) => {
+        ids.forEach(id => {
+          const section = document.getElementById(id);
+          if(filter === 'all' && key === 'all') {
+            section.hidden = false;
+          } else if (filter === key) {
+            section.hidden = false;
+          } else if (filter !== 'all' && key === 'all') {
+            section.hidden = true;
+          } else if (filter !== key && key !== 'all') {
+            section.hidden = true;
+          }
+        });
+      });
+    });
+  });
+</script>
+</body>
+</html>
+
